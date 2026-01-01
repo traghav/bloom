@@ -1,7 +1,8 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import type { TreeNode } from '../../types';
 import { useUiStore, useTreeStore } from '../../stores';
+import { NodeActions } from '../common/NodeActions';
 
 interface NodeSectionProps {
   node: TreeNode;
@@ -18,6 +19,7 @@ export const NodeSection = memo(function NodeSection({
 }: NodeSectionProps) {
   const { isNodeCollapsed, toggleNodeCollapse } = useUiStore();
   const { selectNode, hasChildren } = useTreeStore();
+  const [isHovered, setIsHovered] = useState(false);
 
   const collapsed = isNodeCollapsed(node.id) && !isLast;
   const nodeHasChildren = hasChildren(node.id);
@@ -37,10 +39,12 @@ export const NodeSection = memo(function NodeSection({
       <div
         className={`
           flex items-center gap-2 px-3 py-2 border-b border-[var(--color-border)]
-          bg-opacity-50 cursor-pointer select-none
+          bg-opacity-50 cursor-pointer select-none relative
           ${node.source === 'ai' ? 'bg-blue-50' : 'bg-gray-50'}
         `}
         onClick={() => selectNode(node.id)}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
         {/* Collapse toggle (only for ancestors) */}
         {!isLast && (
@@ -79,17 +83,22 @@ export const NodeSection = memo(function NodeSection({
         )}
 
         {/* Has children indicator */}
-        {nodeHasChildren && (
+        {nodeHasChildren && !isHovered && (
           <span className="text-[10px] text-[var(--color-text-muted)] ml-auto">
-            {nodeHasChildren ? '⤵' : ''}
+            ⤵
           </span>
         )}
 
         {/* Streaming indicator */}
         {node.isStreaming && (
-          <span className="text-[10px] px-1.5 py-0.5 bg-yellow-200 animate-pulse ml-auto">
+          <span className="text-[10px] px-1.5 py-0.5 bg-yellow-200 animate-pulse">
             streaming...
           </span>
+        )}
+
+        {/* Actions on hover */}
+        {isHovered && !node.isStreaming && (
+          <NodeActions nodeId={node.id} className="ml-auto" />
         )}
       </div>
 

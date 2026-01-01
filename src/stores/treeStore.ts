@@ -51,6 +51,13 @@ interface TreeStore {
   // Fork-on-edit
   forkNode: (nodeId: string, newText: string) => string;
 
+  // Clone operations
+  cloneNode: (nodeId: string) => string | null;
+  cloneBranch: (nodeId: string) => string | null;
+
+  // Quick add
+  addEmptyChild: (parentId: string) => string;
+
   // Clear tree
   clearTree: () => Promise<void>;
 
@@ -216,6 +223,83 @@ export const useTreeStore = create<TreeStore>((set, get) => ({
     get()._persistNodes();
 
     return forkedNode.id;
+  },
+
+  // Clone a node as a sibling (same parent, copy of content)
+  cloneNode: (nodeId) => {
+    const { nodes } = get();
+    const original = nodes[nodeId];
+    if (!original) return null;
+
+    const clonedNode = createNode(original.parentId, original.text, original.source, {
+      role: original.role,
+      metadata: { ...original.metadata },
+    });
+
+    const newNodes = { ...nodes, [clonedNode.id]: clonedNode };
+
+    set({ nodes: newNodes, selectedNodeId: clonedNode.id });
+    get()._recordHistory({
+      type: 'CREATE_NODE',
+      nodeId: clonedNode.id,
+    });
+    get()._persistNodes();
+
+    return clonedNode.id;
+  },
+
+  // Clone a node and all its descendants as a sibling branch
+  cloneBranch: (nodeId) => {
+    const { nodes, getDescendants } = get();
+    const original = nodes[nodeId];
+    if (!original) return null;
+
+    const descendants = getDescendants(nodeId);
+    const newNodes = { ...nodes };
+    const idMapping: Record<string, string> = {};
+
+    // Clone the root node of the branch
+    const clonedRoot = createNode(original.parentId, original.text, original.source, {
+      role: original.role,
+      metadata: { ...original.metadata },
+    });
+    idMapping[original.id] = clonedRoot.id;
+    newNodes[clonedRoot.id] = clonedRoot;
+
+    // Clone all descendants, updating parent references
+    for (const desc of descendants) {
+      const newParentId = desc.parentId ? idMapping[desc.parentId] : null;
+      const clonedDesc = createNode(newParentId, desc.text, desc.source, {
+        role: desc.role,
+        metadata: { ...desc.metadata },
+      });
+      idMapping[desc.id] = clonedDesc.id;
+      newNodes[clonedDesc.id] = clonedDesc;
+    }
+
+    set({ nodes: newNodes, selectedNodeId: clonedRoot.id });
+    get()._recordHistory({
+      type: 'CREATE_NODE',
+      nodeId: clonedRoot.id,
+    });
+    get()._persistNodes();
+
+    return clonedRoot.id;
+  },
+
+  // Quick add an empty child node
+  addEmptyChild: (parentId) => {
+    const node = createNode(parentId, '', 'human');
+    const { nodes } = get();
+
+    const newNodes = { ...nodes, [node.id]: node };
+
+    set({ nodes: newNodes, selectedNodeId: node.id });
+
+    get()._recordHistory({ type: 'CREATE_NODE', nodeId: node.id });
+    get()._persistNodes();
+
+    return node.id;
   },
 
   // Delete a node and its descendants

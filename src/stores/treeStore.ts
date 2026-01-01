@@ -51,6 +51,9 @@ interface TreeStore {
   // Fork-on-edit
   forkNode: (nodeId: string, newText: string) => string;
 
+  // Clear tree
+  clearTree: () => Promise<void>;
+
   // Batch generation
   createSiblingNodes: (
     parentId: string | null,
@@ -156,7 +159,7 @@ export const useTreeStore = create<TreeStore>((set, get) => ({
   // Create a child node
   createChildNode: (parentId, text, source, options) => {
     const node = createNode(parentId, text, source, options);
-    const { nodes, currentDocumentId } = get();
+    const { nodes } = get();
 
     const newNodes = { ...nodes, [node.id]: node };
 
@@ -250,6 +253,47 @@ export const useTreeStore = create<TreeStore>((set, get) => ({
       deletedNodes: nodesToDelete,
     });
     get()._persistNodes();
+  },
+
+  // Clear the entire tree and start fresh
+  clearTree: async () => {
+    const { currentDocumentId } = get();
+
+    // Create a new empty root node
+    const rootNode = createNode(null, '', 'human');
+    const newNodes = { [rootNode.id]: rootNode };
+
+    // Clear IndexedDB
+    await db.nodes.clear();
+    await saveNodes(newNodes);
+
+    // Create initial history entry
+    if (currentDocumentId) {
+      const entry: TreeHistoryEntry = {
+        id: crypto.randomUUID(),
+        timestamp: Date.now(),
+        action: { type: 'INITIAL', nodeId: rootNode.id },
+        snapshot: { ...newNodes },
+        parentEntryId: null,
+      };
+      await saveHistoryEntry(currentDocumentId, entry);
+
+      set({
+        nodes: newNodes,
+        rootId: rootNode.id,
+        selectedNodeId: rootNode.id,
+        historyEntries: [entry],
+        currentEntryId: entry.id,
+      });
+    } else {
+      set({
+        nodes: newNodes,
+        rootId: rootNode.id,
+        selectedNodeId: rootNode.id,
+        historyEntries: [],
+        currentEntryId: null,
+      });
+    }
   },
 
   // Create multiple sibling nodes (for batch generation)

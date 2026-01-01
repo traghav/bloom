@@ -1,5 +1,4 @@
 import type { TreeNode, TreeNodeMap } from '../types';
-import type { TreeHistoryEntry } from '../types/tree';
 
 export interface ExportedTree {
   version: 1;

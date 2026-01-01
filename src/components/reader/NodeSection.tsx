@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import ReactMarkdown from 'react-markdown';
 import type { TreeNode } from '../../types';
 import { useUiStore, useTreeStore } from '../../stores';
 
@@ -96,13 +97,15 @@ export const NodeSection = memo(function NodeSection({
       {!collapsed && (
         <div className="p-4">
           {children || (
-            <div className="whitespace-pre-wrap font-mono text-sm min-h-[2em]">
-              {node.text || (
-                <span className="text-[var(--color-text-muted)] italic">
-                  Empty node
-                </span>
-              )}
-            </div>
+            node.text ? (
+              <div className="prose prose-sm max-w-none prose-headings:mt-2 prose-headings:mb-1 prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0 prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-100 prose-pre:p-3">
+                <ReactMarkdown>{node.text}</ReactMarkdown>
+              </div>
+            ) : (
+              <span className="text-[var(--color-text-muted)] italic">
+                Empty node
+              </span>
+            )
           )}
         </div>
       )}

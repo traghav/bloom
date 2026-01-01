@@ -10,11 +10,18 @@ import { registerProvider, streamingFetch } from './base';
 const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
 
 const models: ModelInfo[] = [
-  { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4', contextWindow: 200000 },
+  // Claude 4.5 Family (Latest)
+  { id: 'claude-opus-4-5-20251124', name: 'Claude Opus 4.5', contextWindow: 200000 },
+  { id: 'claude-sonnet-4-5-20250929', name: 'Claude Sonnet 4.5', contextWindow: 200000 },
+  { id: 'claude-haiku-4-5-20251201', name: 'Claude Haiku 4.5', contextWindow: 200000 },
+  // Claude 4.1 Family
+  { id: 'claude-opus-4-1-20250805', name: 'Claude Opus 4.1', contextWindow: 200000 },
+  // Claude 4 Family
   { id: 'claude-opus-4-20250514', name: 'Claude Opus 4', contextWindow: 200000 },
+  { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4', contextWindow: 200000 },
+  // Claude 3.5 (Legacy but still available)
   { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet', contextWindow: 200000 },
   { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku', contextWindow: 200000 },
-  { id: 'claude-3-opus-20240229', name: 'Claude 3 Opus', contextWindow: 200000 },
 ];
 
 export const anthropicProvider: LLMProvider = {
@@ -31,7 +38,7 @@ export const anthropicProvider: LLMProvider = {
     const startTime = Date.now();
     let fullText = '';
     let tokenUsage = { prompt: 0, completion: 0 };
-    let rawResponse: unknown = null;
+    const rawResponse: unknown = null;
 
     // Extract system message
     const systemMessage = params.messages.find((m) => m.role === 'system');

@@ -20,13 +20,13 @@ export interface StoredHistoryEntry {
   parentEntryId: string | null;
 }
 
-class LoomDatabase extends Dexie {
+class BloomDatabase extends Dexie {
   nodes!: Table<TreeNode, string>;
   documents!: Table<TreeDocument, string>;
   historyEntries!: Table<StoredHistoryEntry, string>;
 
   constructor() {
-    super('loom');
+    super('bloom');
 
     this.version(1).stores({
       nodes: 'id, parentId, createdAt, updatedAt',
@@ -36,7 +36,7 @@ class LoomDatabase extends Dexie {
   }
 }
 
-export const db = new LoomDatabase();
+export const db = new BloomDatabase();
 
 // Document operations
 export async function createDocument(name: string): Promise<TreeDocument> {

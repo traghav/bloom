@@ -6,9 +6,11 @@ const now = Date.now();
 const root: TreeNode = {
   id: 'sample-root',
   parentId: null,
-  text: `# Welcome to Loom
+  text: `# Welcome to Bloom
 
-This is a **multiversal tree writing interface** for exploring branching narratives with AI.
+Bloom is a **multiversal tree writing interface** for exploring branching narratives with AI.
+
+> Inspired by [Loom](https://github.com/socketteer/loom) by janus
 
 ## How it works
 

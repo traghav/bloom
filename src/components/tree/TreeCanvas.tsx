@@ -5,7 +5,6 @@ import {
   Controls,
   type Node,
   type Edge,
-  type OnNodesChange,
   type NodeTypes,
   useNodesState,
   useEdgesState,
@@ -32,10 +31,6 @@ export function TreeCanvas() {
     }
 
     // BFS to position nodes
-    const queue: Array<{ id: string; depth: number; index: number; parentIndex: number }> = [
-      { id: rootId, depth: 0, index: 0, parentIndex: 0 },
-    ];
-
     const nodesByDepth: Map<number, string[]> = new Map();
     const nodePositions: Map<string, { x: number; y: number }> = new Map();
 

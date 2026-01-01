@@ -53,14 +53,14 @@ export const useSettingsStore = create<SettingsStore>()(
 
       // Provider/Model
       currentProvider: 'openai',
-      currentModel: 'gpt-4o',
+      currentModel: 'gpt-4.1-mini',
 
       setProvider: (provider) => {
         // Set default model for provider
         const defaultModels: Record<ProviderName, string> = {
-          openai: 'gpt-4o',
-          anthropic: 'claude-sonnet-4-20250514',
-          gemini: 'gemini-2.0-flash',
+          openai: 'gpt-4.1-mini',
+          anthropic: 'claude-sonnet-4-5-20250929',
+          gemini: 'gemini-2.5-flash',
         };
         set({
           currentProvider: provider,
@@ -93,7 +93,7 @@ export const useSettingsStore = create<SettingsStore>()(
       closeSettings: () => set({ isSettingsOpen: false }),
     }),
     {
-      name: 'loom-settings',
+      name: 'bloom-settings',
       partialize: (state) => ({
         apiKeys: state.apiKeys,
         currentProvider: state.currentProvider,

@@ -75,7 +75,7 @@ export const useUiStore = create<UiStore>()(
       clearError: () => set({ error: null }),
     }),
     {
-      name: 'loom-ui',
+      name: 'bloom-ui',
       partialize: (state) => ({
         leftPanelWidth: state.leftPanelWidth,
       }),

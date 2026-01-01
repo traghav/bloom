@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react';
 import { useTreeStore, useSettingsStore, useUiStore } from '../stores';
 import { getProvider } from '../providers';
-import type { Message, GenerateResult } from '../types';
+import type { Message } from '../types';
 import { createNode } from '../types';
 import { computeAncestors } from '../types/tree';
 
@@ -18,7 +18,6 @@ export function useGeneration() {
     createSiblingNodes,
     setNodeStreaming,
     appendToNode,
-    getNode,
   } = useTreeStore();
 
   const {

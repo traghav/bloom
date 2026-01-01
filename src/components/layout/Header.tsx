@@ -1,17 +1,18 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useSettingsStore, useTreeStore, useUiStore } from '../../stores';
 import { exportToJson, downloadJson, parseImportedJson, importedNodesToMap } from '../../utils/export';
 
 export function Header() {
   const { currentProvider, currentModel, openSettings, generationMode, setGenerationMode } =
     useSettingsStore();
-  const { nodes, canUndo, canRedo, undo, redo } = useTreeStore();
+  const { nodes, canUndo, canRedo, undo, redo, clearTree } = useTreeStore();
   const { openSearch, isGenerating, setError } = useUiStore();
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleExport = () => {
-    const json = exportToJson(nodes, 'loom-tree');
-    const filename = `loom-export-${new Date().toISOString().slice(0, 10)}.json`;
+    const json = exportToJson(nodes, 'bloom-tree');
+    const filename = `bloom-export-${new Date().toISOString().slice(0, 10)}.json`;
     downloadJson(json, filename);
   };
 
@@ -64,7 +65,7 @@ export function Header() {
     <header className="h-12 border-b border-[var(--color-border)] bg-[var(--color-bg)] flex items-center justify-between px-4 flex-shrink-0">
       {/* Left: Title */}
       <div className="flex items-center gap-4">
-        <h1 className="text-sm font-medium tracking-tight">LOOM</h1>
+        <h1 className="text-sm font-medium tracking-tight">BLOOM</h1>
       </div>
 
       {/* Center: Model info */}
@@ -161,6 +162,15 @@ export function Header() {
           className="hidden"
         />
 
+        {/* New Tree */}
+        <button
+          onClick={() => setShowClearConfirm(true)}
+          className="text-xs px-2 py-1 border border-[var(--color-border)] hover:border-[var(--color-accent)] transition-colors"
+          title="Start a new tree (clears current)"
+        >
+          New
+        </button>
+
         {/* Settings */}
         <button
           onClick={openSettings}
@@ -170,6 +180,35 @@ export function Header() {
           Settings
         </button>
       </div>
+
+      {/* Clear confirmation dialog */}
+      {showClearConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-[var(--color-bg)] border border-[var(--color-border)] p-6 max-w-sm">
+            <h3 className="text-sm font-medium mb-2">Start New Tree?</h3>
+            <p className="text-xs text-[var(--color-text-muted)] mb-4">
+              This will clear the current tree. Make sure to export first if you want to save your work.
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setShowClearConfirm(false)}
+                className="text-xs px-3 py-1.5 border border-[var(--color-border)] hover:border-[var(--color-accent)] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  clearTree();
+                  setShowClearConfirm(false);
+                }}
+                className="text-xs px-3 py-1.5 bg-[var(--color-accent)] text-white hover:opacity-90 transition-opacity"
+              >
+                Clear & Start New
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

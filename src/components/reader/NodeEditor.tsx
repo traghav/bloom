@@ -13,14 +13,14 @@ interface NodeEditorProps {
 }
 
 // Debounce helper
-function debounce<T extends (...args: unknown[]) => void>(
-  fn: T,
+function debounce(
+  fn: (text: string) => void,
   delay: number
-): (...args: Parameters<T>) => void {
+): (text: string) => void {
   let timeoutId: ReturnType<typeof setTimeout>;
-  return (...args: Parameters<T>) => {
+  return (text: string) => {
     clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => fn(...args), delay);
+    timeoutId = setTimeout(() => fn(text), delay);
   };
 }
 

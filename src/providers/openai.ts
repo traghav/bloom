@@ -10,14 +10,20 @@ import { registerProvider, streamingFetch } from './base';
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
 const models: ModelInfo[] = [
+  // GPT-5 Family (Latest)
+  { id: 'gpt-5', name: 'GPT-5', contextWindow: 256000 },
+  { id: 'gpt-5-mini', name: 'GPT-5 Mini', contextWindow: 128000 },
+  // GPT-4.1 Family
+  { id: 'gpt-4.1', name: 'GPT-4.1', contextWindow: 1000000 },
+  { id: 'gpt-4.1-mini', name: 'GPT-4.1 Mini', contextWindow: 1000000 },
+  { id: 'gpt-4.1-nano', name: 'GPT-4.1 Nano', contextWindow: 1000000 },
+  // o-Series Reasoning
+  { id: 'o3', name: 'o3', contextWindow: 200000 },
+  { id: 'o3-mini', name: 'o3 Mini', contextWindow: 200000 },
+  { id: 'o4-mini', name: 'o4 Mini', contextWindow: 200000 },
+  // GPT-4o (Legacy but still useful for audio)
   { id: 'gpt-4o', name: 'GPT-4o', contextWindow: 128000, supportsLogprobs: true },
   { id: 'gpt-4o-mini', name: 'GPT-4o Mini', contextWindow: 128000, supportsLogprobs: true },
-  { id: 'gpt-4-turbo', name: 'GPT-4 Turbo', contextWindow: 128000, supportsLogprobs: true },
-  { id: 'gpt-4', name: 'GPT-4', contextWindow: 8192, supportsLogprobs: true },
-  { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', contextWindow: 16385, supportsLogprobs: true },
-  { id: 'o1', name: 'o1', contextWindow: 200000 },
-  { id: 'o1-mini', name: 'o1 Mini', contextWindow: 128000 },
-  { id: 'o1-preview', name: 'o1 Preview', contextWindow: 128000 },
 ];
 
 export const openaiProvider: LLMProvider = {
@@ -35,7 +41,7 @@ export const openaiProvider: LLMProvider = {
     let fullText = '';
     let tokenUsage = { prompt: 0, completion: 0 };
     let logprobs: unknown = null;
-    let rawResponse: unknown = null;
+    const rawResponse: unknown = null;
 
     // Handle continue vs respond mode
     const messages = params.mode === 'continue'
@@ -48,8 +54,8 @@ export const openaiProvider: LLMProvider = {
         ]
       : params.messages;
 
-    // Check if model is o1 series (different parameters)
-    const isO1 = params.model.startsWith('o1');
+    // Check if model is o-series or gpt-5 (different parameters)
+    const isReasoningModel = params.model.startsWith('o') || params.model.startsWith('gpt-5');
 
     const body: Record<string, unknown> = {
       model: params.model,
@@ -57,8 +63,8 @@ export const openaiProvider: LLMProvider = {
       stream: true,
     };
 
-    // o1 models don't support temperature/top_p
-    if (!isO1) {
+    // Reasoning models don't support temperature/top_p
+    if (!isReasoningModel) {
       body.temperature = params.temperature;
       body.max_tokens = params.maxTokens;
       body.top_p = params.topP;

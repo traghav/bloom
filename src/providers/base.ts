@@ -1,7 +1,6 @@
 import type {
   LLMProvider,
   GenerateParams,
-  GenerateResult,
   StreamChunk,
   ModelInfo,
   ProviderName,

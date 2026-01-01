@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Handle, Position, type NodeProps } from '@xyflow/react';
+import { Handle, Position } from '@xyflow/react';
 import type { TreeNode } from '../../types';
 
 interface TreeNodeData {
@@ -9,7 +9,7 @@ interface TreeNodeData {
 
 export const TreeNodeComponent = memo(function TreeNodeComponent({
   data,
-}: NodeProps<{ data: TreeNodeData }>) {
+}: { data: TreeNodeData }) {
   // Handle the case where data might be the actual TreeNodeData or wrapped
   const nodeData = 'node' in data ? data : (data as unknown as TreeNodeData);
   const { node, isSelected } = nodeData;

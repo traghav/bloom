@@ -10,11 +10,16 @@ import { registerProvider } from './base';
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 const models: ModelInfo[] = [
+  // Gemini 2.5 Family (Latest)
+  { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro', contextWindow: 1000000 },
+  { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash', contextWindow: 1000000 },
+  { id: 'gemini-2.5-flash-lite', name: 'Gemini 2.5 Flash Lite', contextWindow: 1000000 },
+  // Gemini 2.0 Family
   { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', contextWindow: 1000000 },
   { id: 'gemini-2.0-flash-lite', name: 'Gemini 2.0 Flash Lite', contextWindow: 1000000 },
-  { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro', contextWindow: 2000000 },
-  { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash', contextWindow: 1000000 },
-  { id: 'gemini-1.5-flash-8b', name: 'Gemini 1.5 Flash 8B', contextWindow: 1000000 },
+  // Gemini 3 Preview (if available)
+  { id: 'gemini-3-pro-preview', name: 'Gemini 3 Pro (Preview)', contextWindow: 1000000 },
+  { id: 'gemini-3-flash-preview', name: 'Gemini 3 Flash (Preview)', contextWindow: 1000000 },
 ];
 
 export const geminiProvider: LLMProvider = {
@@ -31,7 +36,7 @@ export const geminiProvider: LLMProvider = {
     const startTime = Date.now();
     let fullText = '';
     let tokenUsage = { prompt: 0, completion: 0 };
-    let rawResponse: unknown = null;
+    const rawResponse: unknown = null;
 
     // Extract system message
     const systemMessage = params.messages.find((m) => m.role === 'system');
